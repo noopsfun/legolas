@@ -2,21 +2,11 @@
 > My blog template
 
 ## ScreenShot
+![Home](./screenshot/home-1.jpg)
+![Home](./screenshot/post-1.png)
+![Post](./screenshot/home-2.png)
+![Post](./screenshot/post-2.png)
 
-<p align="center">
-  <img width="600" src="./screenshot/home-1.jpg" >
-</p>
-<p align="center">
-  <img width="600" src="./screenshot/post-1.png" >
-</p>
-
-<p align="center">
-  <img width="600" src="./screenshot/home-2.png" >
-</p>
-
-<p align="center">
-  <img width="600" src="./screenshot/post-2.png" >
-</p>
 
 ## My Blog
 
