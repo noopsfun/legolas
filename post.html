@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章</title>
+    <link rel="stylesheet" href="./css/normalize.css">
+    <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="./font/iconfont.css">
+    <link rel="stylesheet" href="./hl/prism.css">
+    <script src="./hl/prism.js"></script>
+
+</head>
+
+<body>
+    <!-- header -->
+    <header class="nav-header">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="#">
+                    <img src="./img/logo.png" alt="">
+                </a>
+            </div>
+            <div class="nav-menu">
+                <ul>
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="tags.html">标签</a></li>
+                    <li><a href="archive.html">归档</a></li>
+                    <li><a href="about.html">关于</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="content">
+
+            <div class="article">
+                <article class="post-content">
+                    <header class="post-header">
+                        <div class="post-title">使用go写一个检查域名证书过期时间的工具</div>
+                    </header>
+                    <div class="post-detail">
+
+                        <blockquote>
+                            <p>使用go写一个检查域名证书过期时间的工具</p>
+                        </blockquote>
+                        <h2 id="toc_0">代码</h2>
+
+                        <pre><code class="language-go">package main
+                        
+                        import (
+                         &quot;crypto/tls&quot;
+                         &quot;flag&quot;
+                           &quot;fmt&quot;
+                            &quot;time&quot;
+                        )
+                        
+                        func check(domain string, ch chan&lt;- string) {
+                           // 通过443端口建立连接
+                         conn, err := tls.Dial(&quot;tcp&quot;, fmt.Sprintf(&quot;%s:443&quot;, domain), nil)
+                           if err != nil {
+                                // 将错误信息写到channel
+                              ch &lt;- fmt.Sprintf(&quot;目标: %s:443 连接失败! err: %v&quot;, domain, err)
+                                return
+                         }
+                          defer conn.Close()
+                         status := conn.ConnectionState()
+                           crt := status.PeerCertificates[0]
+                          expireHours := crt.NotAfter.Sub(time.Now()).Hours()
+                            expiredDays := int(expireHours / 24)
+                           if expireHours &gt; 0 {
+                                // 还未过期
+                                ch &lt;- fmt.Sprintf(&quot;域名: %s SSL证书过期时间为: %v 将在 %d 天后过期&quot;, domain, crt.NotAfter.Format(&quot;2006-01-02 15:04:05&quot;), expiredDays)
+                          } else {
+                               // 已经过期
+                                ch &lt;- fmt.Sprintf(&quot;域名: %s SSL证书过期时间为: %v 已过期 %d 天&quot;, domain, crt.NotAfter.Format(&quot;2006-01-02 15:04:05&quot;), expiredDays)
+                            }
+                        }
+                        
+                        func usage() {
+                            fmt.Printf(`Usage: checkDomain DOMAIN1 DOMAIN2...
+                        
+                        Options:
+                        `)
+                         flag.PrintDefaults()
+                        }
+                        
+                        func main() {
+                          var (
+                              h bool
+                         )
+                          ch := make(chan string)
+                            flag.BoolVar(&amp;h, &quot;h&quot;, false, &quot;help&quot;)
+                           flag.Parse()
+                           domainList := flag.Args()
+                          if h {
+                             usage()
+                                return
+                         }
+                          if len(domainList) == 0 {
+                              usage()
+                                return
+                         }
+                          for _, domain := range domainList {
+                                go check(domain, ch)
+                           }
+                          for _, _ = range domainList {
+                              fmt.Println(&lt;-ch)
+                           }
+                        
+                        }
+                        </code></pre>
+
+                        <h2 id="toc_1">使用方法</h2>
+
+                        <p>将代码保存为<code>main.go</code></p>
+
+                        <p><strong>编译</strong></p>
+
+                        <pre><code class="language-shell">go build -o domainCrtCheck main.go
+                        </code></pre>
+
+                        <p><strong>帮助</strong></p>
+
+                        <pre><code class="language-shell"> ./domainCrtCheck -h
+                        Usage: checkDomain DOMAIN1 DOMAIN2...
+                        
+                        Options:
+                          -h    help
+                        </code></pre>
+
+                        <p><strong>测试</strong></p>
+
+                        <pre><code class="language-shell">./domainCrtCheck www.baidu.com www.sina.com www.baixx.xx
+                        目标: www.baixx.xx:443 连接失败! err: dial tcp: lookup www.baixx.xx: no such host
+                        域名: www.sina.com SSL证书过期时间为: 2020-12-10 12:00:00 将在 210 天后过期
+                        域名: www.baidu.com SSL证书过期时间为: 2020-06-25 05:31:02 将在 41 天后过期
+                        </code></pre>
+                    </div>
+                </article>
+            </div>
+
+            <aside class="aside">
+                <section class="post-info">
+                    <div class="post-info-title">
+                        <p>文章信息</p>
+                    </div>
+                    <div class="post-info-detail">
+                        <div class="post-info-detail-article">
+                            <span class="post-info-icon"> <i
+                                    class="iconfont icon-user"></i></span><span>作者：</span><span><img src="./img/avatar"
+                                    alt="" class="small-avatar"></span><span>Gladiator</span>
+                        </div>
+                        <div class="post-info-detail-article">
+                            <span class="post-info-icon"> <i
+                                    class="iconfont icon-time"></i></span><span>发布时间：</span><span>2020-06-25
+                                10:01:02</span>
+                        </div>
+                        <div class="post-info-detail-article">
+                            <span class="post-info-icon"> <i
+                                    class="iconfont icon-yuedu"></i></span><span>阅读数：</span><span>1024</span>
+                        </div>
+                        <div class="post-info-detail-tags">
+                            <ul class="tag-list">
+                                <li><a class="tag-item" href="#">Docker</a></li>
+                                <li><a class="tag-item" href="#">K8s</a></li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section class="post-toc" id="top-fixed">
+                    <div class="post-info-title">
+                        <p>目录</p>
+                    </div>
+                    <div id="toc">
+                        <ul>
+                            <li>
+                                <ul>
+                                    <li><a href="#toc_0" rel="nofollow">Docker Engine</a></li>
+                                    <li><a href="#toc_1" rel="nofollow">Docker架构</a>
+                                        <ul>
+                                            <li><a href="#toc_2" rel="nofollow">Docker daemon</a></li>
+                                            <li><a href="#toc_3" rel="nofollow">Docker client</a></li>
+                                            <li><a href="#toc_4" rel="nofollow">Docker registries</a></li>
+                                            <li><a href="#toc_5" rel="nofollow">Docker objects</a>
+                                                <ul>
+                                                    <li><a href="#toc_6" rel="nofollow">镜像(IMAGES)</a></li>
+                                                    <li><a href="#toc_7" rel="nofollow">容器(CONTAINERS)</a></li>
+                                                    <li><a href="#toc_8" rel="nofollow">服务(SERVICES)</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#toc_9" rel="nofollow">底层技术</a>
+                                        <ul>
+                                            <li><a href="#toc_10" rel="nofollow">Namespaces</a></li>
+                                            <li><a href="#toc_11" rel="nofollow">Control groups(cgroups)</a></li>
+                                            <li><a href="#toc_12" rel="nofollow">Union file systems(联合文件系统)</a></li>
+                                            <li><a href="#toc_13" rel="nofollow">Container format</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#toc_14" rel="nofollow">Relaase channels</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                </section>
+
+            </aside>
+
+        </div>
+    </div>
+
+    <!-- footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <a href="/">首页</a> |
+            <a href="http://www.beian.miit.gov.cn/" target="_blank">京ICP备20018095号</a>
+        </div>
+    </footer>
+
+    <script src="./js/index.js"></script>
+</body>
+
+</html>
