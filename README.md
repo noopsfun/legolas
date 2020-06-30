@@ -2,14 +2,21 @@
 > My blog template
 
 ## ScreenShot
-![Home](https://github.com/noopsfun/legolas/blob/master/screenshot/home-1.jpg)
 
-![Home](https://github.com/noopsfun/legolas/blob/master/screenshot/post-1.png)
+<p align="center">
+  <img width="600" src="./screenshot/home-1.jpg" >
+</p>
+<p align="center">
+  <img width="600" src="./screenshot/post-1.png" >
+</p>
 
-![Post](https://github.com/noopsfun/legolas/blob/master/screenshot/home-2.png)
+<p align="center">
+  <img width="600" src="./screenshot/home-2.png" >
+</p>
 
-![Post](https://github.com/noopsfun/legolas/blob/master/screenshot/post-2.png)
-
+<p align="center">
+  <img width="600" src="./screenshot/post-2.png" >
+</p>
 
 ## My Blog
 
