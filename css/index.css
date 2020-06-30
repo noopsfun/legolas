@@ -51,6 +51,10 @@ a:hover {
     background: none !important;
     text-decoration: none !important;
   }
+  .article > .content-load-more > button:hover {
+    color: #515a6e !important;
+    border-color: #DEDEE2 !important;
+  }
 }
 /* 其他屏幕 >=768px */
 @media screen and (min-width: 768px) {
