@@ -140,7 +140,7 @@ a:hover {
 }
 .article {
   width: 70%;
-  position: absolute;
+  position: relative;
   float: left;
   margin-bottom: 60px;
   padding: 0 10px;
